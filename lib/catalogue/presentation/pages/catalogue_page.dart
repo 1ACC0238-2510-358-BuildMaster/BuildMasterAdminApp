@@ -4,14 +4,20 @@ import '../providers/catalogue_provider.dart';
 import '../widgets/component_card.dart';
 
 class CataloguePage extends StatelessWidget {
-  const CataloguePage({super.key});
+  final int categoryId;
+
+  const CataloguePage({super.key, required this.categoryId});
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<CatalogueProvider>(context);
-    for (var cat in provider.categories) {
-      print('Categoría: ${cat.name}');
+
+    if (provider.selectedCategoryId != categoryId) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        provider.updateFilters(categoryId: categoryId);
+      });
     }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Catálogo de Componentes')),
       body: Column(
@@ -26,29 +32,13 @@ class CataloguePage extends StatelessWidget {
                 DropdownButton<String>(
                   value: provider.selectedType,
                   hint: const Text("Tipo"),
-                  items: [ // Se tiene que respetar esto para alivar la carga tanto en front como en back
-                    'Alta',
-                    'Media',
-                    'Baja'
-                  ]
+                  items: ['Alta', 'Media', 'Baja']
                       .map((type) => DropdownMenuItem(
                     value: type,
                     child: Text(type),
                   ))
                       .toList(),
                   onChanged: (value) => provider.updateFilters(type: value),
-                ),
-                DropdownButton<int>(
-                  value: provider.selectedCategoryId,
-                  hint: const Text("Categoría"),
-                  items: provider.categories
-                      .map((cat) => DropdownMenuItem(
-                    value: cat.id,
-                    child: Text('${cat.name}', style: const TextStyle(fontFamily: 'Roboto')),
-                  ))
-                      .toList(),
-                  onChanged: (value) =>
-                      provider.updateFilters(categoryId: value),
                 ),
                 DropdownButton<int>(
                   value: provider.selectedManufacturerId,
@@ -84,6 +74,7 @@ class CataloguePage extends StatelessWidget {
               itemCount: provider.components.length,
               itemBuilder: (_, index) => ComponentCard(
                 component: provider.components[index],
+                currentCategoryId: categoryId,
               ),
             ),
           ),
