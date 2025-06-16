@@ -9,7 +9,9 @@ class CataloguePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<CatalogueProvider>(context);
-
+    for (var cat in provider.categories) {
+      print('Categoría: ${cat.name}');
+    }
     return Scaffold(
       appBar: AppBar(title: const Text('Catálogo de Componentes')),
       body: Column(
@@ -24,14 +26,17 @@ class CataloguePage extends StatelessWidget {
                 DropdownButton<String>(
                   value: provider.selectedType,
                   hint: const Text("Tipo"),
-                  items: ['CPU', 'GPU', 'RAM', 'Motherboard']
+                  items: [ // Se tiene que respetar esto para alivar la carga tanto en front como en back
+                    'Alta',
+                    'Media',
+                    'Baja'
+                  ]
                       .map((type) => DropdownMenuItem(
                     value: type,
                     child: Text(type),
                   ))
                       .toList(),
-                  onChanged: (value) =>
-                      provider.updateFilters(type: value),
+                  onChanged: (value) => provider.updateFilters(type: value),
                 ),
                 DropdownButton<int>(
                   value: provider.selectedCategoryId,
@@ -39,7 +44,7 @@ class CataloguePage extends StatelessWidget {
                   items: provider.categories
                       .map((cat) => DropdownMenuItem(
                     value: cat.id,
-                    child: Text(cat.name),
+                    child: Text('${cat.name}', style: const TextStyle(fontFamily: 'Roboto')),
                   ))
                       .toList(),
                   onChanged: (value) =>

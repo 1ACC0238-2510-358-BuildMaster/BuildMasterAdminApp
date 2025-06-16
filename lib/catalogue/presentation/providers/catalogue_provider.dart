@@ -16,7 +16,7 @@ class CatalogueProvider extends ChangeNotifier {
     required this.getCategoriesUseCase,
     required this.getManufacturersUseCase,
   });
-
+  List<Component> allComponents = [];
   List<Component> components = [];
   List<Category> categories = [];
   List<Manufacturer> manufacturers = [];
@@ -42,15 +42,28 @@ class CatalogueProvider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    components = await getComponentsUseCase(
-      name: searchName,
-      type: selectedType,
-      categoryId: selectedCategoryId,
-      manufacturerId: selectedManufacturerId,
-    );
+    allComponents = await getComponentsUseCase();
+    applyFilters();
 
     isLoading = false;
     notifyListeners();
+  }
+  void applyFilters() {
+    components = allComponents.where((component) {
+      final nameMatch = searchName == null || searchName!.isEmpty
+          || component.name.toLowerCase().contains(searchName!.toLowerCase());
+
+      final typeMatch = selectedType == null
+          || component.type.toLowerCase() == selectedType!.toLowerCase();
+
+      final categoryMatch = selectedCategoryId == null
+          || component.category.id == selectedCategoryId;
+
+      final manufacturerMatch = selectedManufacturerId == null
+          || component.manufacturer.id == selectedManufacturerId;
+
+      return nameMatch && typeMatch && categoryMatch && manufacturerMatch;
+    }).toList();
   }
 
   void updateFilters({
@@ -63,6 +76,9 @@ class CatalogueProvider extends ChangeNotifier {
     selectedCategoryId = categoryId;
     selectedManufacturerId = manufacturerId;
     searchName = name;
-    fetchComponents();
+
+    applyFilters();
+    notifyListeners();
   }
+
 }

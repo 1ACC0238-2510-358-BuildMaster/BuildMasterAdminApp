@@ -24,7 +24,8 @@ class ComponentApiService {
 
     final response = await http.get(uri);
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
+      final List<dynamic> jsonList =
+      json.decode(utf8.decode(response.bodyBytes));
       return jsonList.map((json) => ComponentModel.fromJson(json)).toList();
     } else {
       throw Exception('Error al obtener componentes: ${response.statusCode}');

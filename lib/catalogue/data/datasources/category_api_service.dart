@@ -13,7 +13,7 @@ class CategoryApiService {
     final response = await http.get(Uri.parse(baseUrl));
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
+      final List<dynamic> jsonList = json.decode(utf8.decode(response.bodyBytes));
       return jsonList.map((json) => CategoryModel.fromJson(json)).toList();
     } else {
       throw Exception('Error al obtener categorías: ${response.statusCode}');
