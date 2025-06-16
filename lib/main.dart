@@ -9,8 +9,10 @@ import 'catalogue/domain/usecases/get_categories.dart';
 import 'catalogue/domain/usecases/get_manufacturers.dart';
 import 'catalogue/presentation/pages/catalogue_page.dart';
 import 'catalogue/presentation/providers/catalogue_provider.dart';
+import 'login/domain/entities/login.dart';
 
 void main() {
+  // Initialize catalogue repository
   final catalogueRepository = CatalogueRepositoryImpl(
     componentService: ComponentApiService(),
     categoryService: CategoryApiService(),
@@ -18,28 +20,45 @@ void main() {
   );
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => CatalogueProvider(
-        getComponentsUseCase: GetComponentsUseCase(catalogueRepository),
-        getCategoriesUseCase: GetCategoriesUseCase(catalogueRepository),
-        getManufacturersUseCase: GetManufacturersUseCase(catalogueRepository),
-      )..loadInitialData(),
-      child: const MyApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => CatalogueProvider(
+            getComponentsUseCase: GetComponentsUseCase(catalogueRepository),
+            getCategoriesUseCase: GetCategoriesUseCase(catalogueRepository),
+            getManufacturersUseCase: GetManufacturersUseCase(catalogueRepository),
+          )..loadInitialData(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Build Master Admin',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: LoginFlow(
+          baseUrl: 'https://api.example.com/api/auth',
+          onAuthenticated: () {
+            // Navigate to CataloguePage after successful login
+            // Replace with your own routing logic if needed:
+            runApp(
+              ChangeNotifierProvider.value(
+                value: CatalogueProvider(
+                  getComponentsUseCase: GetComponentsUseCase(catalogueRepository),
+                  getCategoriesUseCase: GetCategoriesUseCase(catalogueRepository),
+                  getManufacturersUseCase: GetManufacturersUseCase(catalogueRepository),
+                )..loadInitialData(),
+                child: MaterialApp(
+                  title: 'Build Master Admin',
+                  theme: ThemeData(
+                    colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+                  ),
+                  home: CataloguePage(),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     ),
   );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Build Master Admin',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const CataloguePage(),
-    );
-  }
 }
