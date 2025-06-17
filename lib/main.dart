@@ -10,6 +10,7 @@ import 'catalogue/domain/usecases/get_manufacturers.dart';
 import 'catalogue/presentation/providers/catalogue_provider.dart';
 import 'catalogue/presentation/providers/build_provider.dart';
 import 'catalogue/presentation/pages/build_configuration_page.dart';
+import '../dashboard_page.dart';
 
 void main() {
   final catalogueRepository = CatalogueRepositoryImpl(
@@ -65,7 +66,7 @@ class MyApp extends StatelessWidget {
           textColor: Colors.black,
         ),
       ),
-      home: const BuildConfiguratorPage(),
+      home: const DashboardPage(),
     );
   }
 }
