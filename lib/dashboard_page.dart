@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../catalogue/presentation/pages/catalogue_page.dart';
 import '../community/presentation/community_page.dart';
+import '../provider/presentation/pages/provider_screen.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -24,7 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
     // Comunidad
     CommunityPage(),
     // Precios
-    Center(child: Text('Precios', style: TextStyle(fontSize: 24))),
+    ProviderScreen(), // Aquí se muestra la pantalla de precios
   ];
 
   void _onItemTapped(int index) {
