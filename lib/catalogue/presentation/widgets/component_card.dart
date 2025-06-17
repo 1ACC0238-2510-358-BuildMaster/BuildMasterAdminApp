@@ -15,47 +15,83 @@ class ComponentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buildProvider = Provider.of<BuildProvider>(context);
-    final selectedId = buildProvider.getSelectedComponent(currentCategoryId);
-    final isSelected = selectedId == component.id;
+    return Consumer<BuildProvider>(
+      builder: (context, buildProvider, _) {
+        final selectedId = buildProvider.getSelectedComponent(currentCategoryId);
+        final isSelected = selectedId == component.id;
 
-    return GestureDetector(
-      onTap: () {
-        if (isSelected) {
-          buildProvider.deselectComponent(currentCategoryId);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${component.name} deseleccionado de la build'),
-              duration: const Duration(seconds: 1),
+        return GestureDetector(
+          onTap: () {
+            if (isSelected) {
+              buildProvider.deselectComponent(currentCategoryId);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${component.name} deseleccionado de la build')),
+              );
+            } else {
+              buildProvider.selectComponent(currentCategoryId, component.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${component.name} seleccionado para la build')),
+              );
+            }
+          },
+          child: Card(
+            color: isSelected ? Colors.green : Colors.white,
+            elevation: 4,
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: isSelected ? Colors.green.shade900 : Colors.grey.shade300,
+                width: 2,
+              ),
             ),
-          );
-        } else {
-          buildProvider.selectComponent(currentCategoryId, component.id);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${component.name} seleccionado para la build'),
-              duration: const Duration(seconds: 1),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    component.name,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Tipo: ${component.type} | \$${component.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: isSelected ? Colors.white70 : Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        component.manufacturer.name,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black54,
+                        ),
+                      ),
+                      Text(
+                        component.category.name,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          );
-        }
+          ),
+        );
       },
-      child: Card(
-        color: isSelected ? Colors.green[100] : null,
-        margin: const EdgeInsets.all(8.0),
-        child: ListTile(
-          title: Text(component.name),
-          subtitle: Text(
-            'Tipo: ${component.type} | \$${component.price.toStringAsFixed(2)}',
-          ),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(component.manufacturer.name),
-              Text(component.category.name),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

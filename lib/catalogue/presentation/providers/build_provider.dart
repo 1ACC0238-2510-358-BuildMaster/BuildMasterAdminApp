@@ -7,12 +7,13 @@ class BuildProvider extends ChangeNotifier {
   BuildModel get currentBuild => _currentBuild;
 
   void selectComponent(int categoryId, int componentId) {
-    _currentBuild.selectComponent(categoryId: categoryId, componentId: componentId);
+    final existing = _currentBuild.getComponentForCategory(categoryId);
+    if (existing == componentId) {
+      _currentBuild.deselectComponent(categoryId);
+    } else {
+      _currentBuild.selectComponent(categoryId: categoryId, componentId: componentId);
+    }
     notifyListeners();
-  }
-
-  int? getSelectedComponent(int categoryId) {
-    return _currentBuild.getComponentForCategory(categoryId);
   }
 
   void deselectComponent(int categoryId) {
@@ -20,9 +21,16 @@ class BuildProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  int? getSelectedComponent(int categoryId) {
+    return _currentBuild.getComponentForCategory(categoryId);
+  }
+
+  Map<int, int> get selectedComponents => _currentBuild.selectedComponents;
+
   void resetBuild() {
     _currentBuild.clear();
     notifyListeners();
   }
 }
+
 
