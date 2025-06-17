@@ -6,7 +6,7 @@ import '../models/category_model.dart';
 class CategoryApiService {
   final String baseUrl;
 
-  CategoryApiService({this.baseUrl = 'http://10.0.2.2:8080/api/categories'});
+  CategoryApiService({this.baseUrl = 'https://backend-5l98.onrender.com/api/categories'});
 
   /// GET /api/categories
   Future<List<CategoryModel>> fetchCategories() async {
