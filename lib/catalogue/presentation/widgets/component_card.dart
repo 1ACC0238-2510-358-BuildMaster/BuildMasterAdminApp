@@ -19,7 +19,7 @@ class ComponentCard extends StatelessWidget {
       builder: (context, buildProvider, _) {
         final selectedId = buildProvider.getSelectedComponent(currentCategoryId);
         final isSelected = selectedId == component.id;
-
+        print('[DEBUG] Component ID: ${component.id}, Category ID: $currentCategoryId, SelectedID: $selectedId, isSelected: $isSelected');
         return GestureDetector(
           onTap: () {
             if (isSelected) {

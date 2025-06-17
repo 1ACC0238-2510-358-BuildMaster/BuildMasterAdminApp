@@ -35,6 +35,55 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
       ),
       body: Column(
         children: [
+          // COMPONENTES SELECCIONADOS ARRIBA
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            color: Colors.grey.shade200,
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // TÍTULO + BOTÓN RESET
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Componentes seleccionados:',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        buildProvider.resetBuild();
+                      },
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('Resetear'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        textStyle: const TextStyle(fontSize: 14),
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 4),
+                if (buildProvider.selectedComponents.isEmpty)
+                  const Text('No se ha seleccionado ningún componente.')
+                else
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 4.0,
+                    children: buildProvider.selectedComponents.entries.map((entry) {
+                      final category = categories.firstWhere((c) => c.id == entry.key);
+                      return Chip(
+                        label: Text('${category.name} (ID: ${entry.value})'),
+                        backgroundColor: Colors.green.shade100,
+                      );
+                    }).toList(),
+                  ),
+              ],
+            ),
+          ),
+
+          // GRID DE CATEGORÍAS
           Expanded(
             child: categories.isEmpty
                 ? const Center(child: CircularProgressIndicator())
@@ -42,15 +91,14 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.3,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.8,
               ),
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
-                final isSelected = buildProvider.getSelectedComponent(
-                    category.id) != null;
+                final isSelected = buildProvider.getSelectedComponent(category.id) != null;
 
                 return GestureDetector(
                   onTap: () {
@@ -62,19 +110,19 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
                     );
                   },
                   child: Card(
-                    elevation: 4,
+                    elevation: 2,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     color: isSelected ? Colors.green.shade300 : Colors.white,
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(12.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: Text(
                           category.name,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14, // más chico
                             fontWeight: FontWeight.w600,
                             color: isSelected ? Colors.white : Colors.black,
                           ),
@@ -84,37 +132,6 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
                   ),
                 );
               },
-            ),
-          ),
-          // Barra inferior con selección
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: Colors.grey.shade200,
-            width: double.infinity,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Componentes seleccionados:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                if (buildProvider.selectedComponents.isEmpty)
-                  const Text('No se ha seleccionado ningún componente.')
-                else
-                  Wrap(
-                    spacing: 8.0,
-                    children: buildProvider.selectedComponents.entries.map((
-                        entry) {
-                      final category = categories.firstWhere((c) =>
-                      c.id == entry.key);
-                      return Chip(
-                        label: Text('${category.name} (ID: ${entry.value})'),
-                        backgroundColor: Colors.green.shade100,
-                      );
-                    }).toList(),
-                  ),
-              ],
             ),
           ),
         ],

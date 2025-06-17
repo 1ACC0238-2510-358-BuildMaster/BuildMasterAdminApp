@@ -1,25 +1,25 @@
 class BuildModel {
-  final Map<int, int> selectedComponentsByCategory;
-  BuildModel({Map<int, int>? selectedComponentsByCategory})
-      : selectedComponentsByCategory = selectedComponentsByCategory ?? {};
-  final Map<int, int> selectedComponents = {}; // categoryId -> componentId
+  final Map<int, int> _selectedComponents = {}; // categoryId -> componentId
 
   void selectComponent({required int categoryId, required int componentId}) {
-    selectedComponents[categoryId] = componentId;
+    _selectedComponents[categoryId] = componentId;
   }
 
   int? getComponentForCategory(int categoryId) {
-    return selectedComponentsByCategory[categoryId];
+    return _selectedComponents[categoryId];
   }
 
   void removeComponent(int categoryId) {
-    selectedComponentsByCategory.remove(categoryId);
+    _selectedComponents.remove(categoryId);
   }
 
   void deselectComponent(int categoryId) {
-    selectedComponents.remove(categoryId);
+    _selectedComponents.remove(categoryId);
   }
+
   void clear() {
-    selectedComponentsByCategory.clear();
+    _selectedComponents.clear();
   }
+
+  Map<int, int> get selectedComponents => _selectedComponents;
 }

@@ -16,7 +16,6 @@ class CatalogueProvider extends ChangeNotifier {
     required this.getCategoriesUseCase,
     required this.getManufacturersUseCase,
   });
-  List<Component> allComponents = [];
   List<Component> components = [];
   List<Category> categories = [];
   List<Manufacturer> manufacturers = [];
@@ -41,29 +40,15 @@ class CatalogueProvider extends ChangeNotifier {
   Future<void> fetchComponents() async {
     isLoading = true;
     notifyListeners();
-
-    allComponents = await getComponentsUseCase();
-    applyFilters();
+    components = await getComponentsUseCase(
+      name: searchName,
+      type: selectedType,
+      categoryId: selectedCategoryId,
+      manufacturerId: selectedManufacturerId,
+    );
 
     isLoading = false;
     notifyListeners();
-  }
-  void applyFilters() {
-    components = allComponents.where((component) {
-      final nameMatch = searchName == null || searchName!.isEmpty
-          || component.name.toLowerCase().contains(searchName!.toLowerCase());
-
-      final typeMatch = selectedType == null
-          || component.type.toLowerCase() == selectedType!.toLowerCase();
-
-      final categoryMatch = selectedCategoryId == null
-          || component.category.id == selectedCategoryId;
-
-      final manufacturerMatch = selectedManufacturerId == null
-          || component.manufacturer.id == selectedManufacturerId;
-
-      return nameMatch && typeMatch && categoryMatch && manufacturerMatch;
-    }).toList();
   }
 
   void updateFilters({
@@ -71,14 +56,37 @@ class CatalogueProvider extends ChangeNotifier {
     int? categoryId,
     int? manufacturerId,
     String? name,
-  }) {
-    selectedType = type;
-    selectedCategoryId = categoryId;
-    selectedManufacturerId = manufacturerId;
-    searchName = name;
+  }) async {
+    selectedType = type ?? selectedType;
+    selectedCategoryId = categoryId ?? selectedCategoryId;
+    selectedManufacturerId = manufacturerId ?? selectedManufacturerId;
 
-    applyFilters();
+    if (name != null) {
+      searchName = name.trim().isEmpty ? null : name.trim();
+    }
+
+    await fetchComponents();
+  }
+
+
+
+  Future<void> resetFilters() async {
+    selectedType = null;
+    selectedManufacturerId = null;
+    searchName = null;
+    // Mantén la categoría actual
+    await fetchComponents();
     notifyListeners();
   }
+  Future<void> resetFiltersWithCategory(int categoryId) async {
+    selectedType = null;
+    selectedManufacturerId = null;
+    searchName = null;
+    selectedCategoryId = categoryId;
+
+    await fetchComponents();
+    notifyListeners();
+  }
+
 
 }
