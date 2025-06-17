@@ -4,9 +4,17 @@ import 'catalogue/data/datasources/component_api_service.dart';
 import 'catalogue/data/datasources/category_api_service.dart';
 import 'catalogue/data/datasources/manufacturer_api_service.dart';
 import 'catalogue/data/repositories/catalogue_repository_impl.dart';
+import 'catalogue/domain/usecases/create_component.dart';
+import 'catalogue/domain/usecases/create_manufacturer.dart';
+import 'catalogue/domain/usecases/delete_component.dart';
+import 'catalogue/domain/usecases/delete_manufacturer.dart';
 import 'catalogue/domain/usecases/get_components.dart';
 import 'catalogue/domain/usecases/get_categories.dart';
 import 'catalogue/domain/usecases/get_manufacturers.dart';
+import 'catalogue/presentation/pages/admin_panel_page.dart';
+import 'catalogue/presentation/pages/manage_categories_page.dart';
+import 'catalogue/presentation/pages/manage_components_page.dart';
+import 'catalogue/presentation/pages/manage_manufacturers_page.dart';
 import 'catalogue/presentation/providers/catalogue_provider.dart';
 import 'catalogue/presentation/providers/build_provider.dart';
 import 'catalogue/presentation/pages/build_configuration_page.dart';
@@ -26,6 +34,10 @@ void main() {
             getComponentsUseCase: GetComponentsUseCase(catalogueRepository),
             getCategoriesUseCase: GetCategoriesUseCase(catalogueRepository),
             getManufacturersUseCase: GetManufacturersUseCase(catalogueRepository),
+            createManufacturerUseCase: CreateManufacturerUseCase(catalogueRepository),
+            deleteManufacturerUseCase: DeleteManufacturerUseCase(catalogueRepository),
+            createComponentUseCase: CreateComponentUseCase(catalogueRepository),
+            deleteComponentUseCase: DeleteComponentUseCase(catalogueRepository),
           )..loadInitialData(),
         ),
         ChangeNotifierProvider(
@@ -65,7 +77,14 @@ class MyApp extends StatelessWidget {
           textColor: Colors.black,
         ),
       ),
-      home: const BuildConfiguratorPage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const BuildConfiguratorPage(),
+        '/admin': (context) => const AdminPanelPage(),
+        '/admin/categories': (context) => const ManageCategoriesPage(),
+        '/admin/manufacturers': (context) => const ManageManufacturersPage(),
+        '/admin/components': (context) => const ManageComponentsPage(),
+      },
     );
   }
 }

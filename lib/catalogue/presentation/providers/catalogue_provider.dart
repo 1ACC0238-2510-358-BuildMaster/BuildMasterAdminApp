@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
+import '../../data/models/component_model.dart';
 import '../../domain/entities/component.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/manufacturer.dart';
+import '../../domain/usecases/create_component.dart';
+import '../../domain/usecases/delete_component.dart';
 import '../../domain/usecases/get_components.dart';
 import '../../domain/usecases/get_categories.dart';
 import '../../domain/usecases/get_manufacturers.dart';
+import '../../domain/usecases/create_manufacturer.dart';
+import '../../domain/usecases/delete_manufacturer.dart';
 
 class CatalogueProvider extends ChangeNotifier {
   final GetComponentsUseCase getComponentsUseCase;
   final GetCategoriesUseCase getCategoriesUseCase;
   final GetManufacturersUseCase getManufacturersUseCase;
+  final CreateManufacturerUseCase createManufacturerUseCase;
+  final DeleteManufacturerUseCase deleteManufacturerUseCase;
+  final CreateComponentUseCase _createComponentUseCase;
+  final DeleteComponentUseCase _deleteComponentUseCase;
 
   CatalogueProvider({
     required this.getComponentsUseCase,
     required this.getCategoriesUseCase,
     required this.getManufacturersUseCase,
-  });
+    required this.createManufacturerUseCase,
+    required this.deleteManufacturerUseCase,
+    required CreateComponentUseCase createComponentUseCase,
+    required DeleteComponentUseCase deleteComponentUseCase,
+  }):_createComponentUseCase = createComponentUseCase,
+        _deleteComponentUseCase = deleteComponentUseCase;
+
   List<Component> components = [];
   List<Category> categories = [];
   List<Manufacturer> manufacturers = [];
@@ -87,6 +102,28 @@ class CatalogueProvider extends ChangeNotifier {
     await fetchComponents();
     notifyListeners();
   }
+  Future<void> createManufacturer(String name) async {
+    await createManufacturerUseCase(name as Manufacturer);
+    manufacturers = await getManufacturersUseCase(); // recarga la lista
+    notifyListeners();
+  }
 
+  Future<void> deleteManufacturer(int id) async {
+    await deleteManufacturerUseCase(id);
+    manufacturers = await getManufacturersUseCase(); // recarga la lista
+    notifyListeners();
+  }
 
+  Future<void> createComponent(ComponentModel componentModel) async {
+    final entity = componentModel.toEntity();
+    await _createComponentUseCase(entity);
+    await fetchComponents(); // recargar lista
+    notifyListeners();
+  }
+
+  Future<void> deleteComponent(int id) async {
+    await _deleteComponentUseCase(id);
+    await fetchComponents();
+    notifyListeners();
+  }
 }
