@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/catalogue_provider.dart';
 import '../providers/build_provider.dart';
 import 'catalogue_page.dart';
+import 'admin_panel_page.dart';
 
 class BuildConfiguratorPage extends StatefulWidget {
   const BuildConfiguratorPage({super.key});
@@ -32,6 +33,18 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configura tu Build'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings),
+            tooltip: 'Modo Admin',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminPanelPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

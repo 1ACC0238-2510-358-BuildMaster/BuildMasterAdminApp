@@ -6,7 +6,7 @@ import '../models/component_model.dart';
 class ComponentApiService {
   final String baseUrl;
 
-  ComponentApiService({this.baseUrl = 'http://10.0.2.2:8080/api/v1/catalogue'});
+  ComponentApiService({this.baseUrl = 'https://backend-5l98.onrender.com/api/v1/catalogue'});
 
   /// GET /api/v1/catalogue?name=&type=&categoryId=&manufacturerId=
   Future<List<ComponentModel>> fetchComponents({
