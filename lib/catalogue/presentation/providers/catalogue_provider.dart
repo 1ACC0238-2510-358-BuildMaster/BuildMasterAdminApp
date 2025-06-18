@@ -102,9 +102,9 @@ class CatalogueProvider extends ChangeNotifier {
     await fetchComponents();
     notifyListeners();
   }
-  Future<void> createManufacturer(String name) async {
-    await createManufacturerUseCase(name as Manufacturer);
-    manufacturers = await getManufacturersUseCase(); // recarga la lista
+  Future<void> createManufacturer(Manufacturer manufacturer) async {
+    await createManufacturerUseCase(manufacturer);
+    manufacturers = await getManufacturersUseCase();
     notifyListeners();
   }
 

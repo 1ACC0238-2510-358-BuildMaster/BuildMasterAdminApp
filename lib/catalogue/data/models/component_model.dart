@@ -36,13 +36,12 @@ class ComponentModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
       'type': type,
       'price': price,
       'specifications': specifications.toJson(),
-      'category': category.toJson(),
-      'manufacturer': manufacturer.toJson(),
+      'categoryId': category.id,
+      'manufacturerId': manufacturer.id,
     };
   }
 

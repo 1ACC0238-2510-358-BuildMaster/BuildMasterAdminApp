@@ -12,6 +12,8 @@ class ManageManufacturersPage extends StatefulWidget {
 
 class _ManageManufacturersPageState extends State<ManageManufacturersPage> {
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController websiteController = TextEditingController();
+  final TextEditingController supportEmailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -23,32 +25,59 @@ class _ManageManufacturersPageState extends State<ManageManufacturersPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nombre del fabricante',
-                      border: OutlineInputBorder(),
-                    ),
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre del fabricante',
+                    border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: websiteController,
+                  decoration: const InputDecoration(
+                    labelText: 'Sitio web',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: supportEmailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Correo de soporte',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () async {
                     final name = nameController.text.trim();
-                    if (name.isNotEmpty) {
-                      final newManu = ManufacturerModel(id: 0, name: name);
-                      await provider.createManufacturer(newManu as String);
+                    final website = websiteController.text.trim();
+                    final email = supportEmailController.text.trim();
+
+                    if (name.isNotEmpty && website.isNotEmpty && email.isNotEmpty) {
+                      final newManu = ManufacturerModel(
+                        id: 0,
+                        name: name,
+                        website: website,
+                        supportEmail: email,
+                      ).toEntity();
+
+                      await provider.createManufacturer(newManu);
+
                       nameController.clear();
+                      websiteController.clear();
+                      supportEmailController.clear();
                     }
                   },
                   child: const Text('Agregar'),
-                )
+                ),
               ],
             ),
           ),
+          const Divider(),
           Expanded(
             child: ListView.builder(
               itemCount: provider.manufacturers.length,
@@ -56,6 +85,7 @@ class _ManageManufacturersPageState extends State<ManageManufacturersPage> {
                 final manu = provider.manufacturers[index];
                 return ListTile(
                   title: Text(manu.name),
+                  subtitle: Text('${manu.website} | ${manu.supportEmail}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => provider.deleteManufacturer(manu.id!),
