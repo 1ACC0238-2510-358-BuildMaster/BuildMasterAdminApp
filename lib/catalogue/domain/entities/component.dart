@@ -19,6 +19,26 @@ class Component {
     required this.category,
     required this.manufacturer,
   });
+
+  Component copyWith({
+    int? id,
+    String? name,
+    String? type,
+    double? price,
+    Specifications? specifications,
+    Category? category,
+    Manufacturer? manufacturer,
+  }) {
+    return Component(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      price: price ?? this.price,
+      specifications: specifications ?? this.specifications,
+      category: category ?? this.category,
+      manufacturer: manufacturer ?? this.manufacturer,
+    );
+  }
 }
 
 class Specifications {
@@ -33,4 +53,18 @@ class Specifications {
     required this.powerConsumptionWatts,
     required this.formFactor,
   });
+
+  Specifications copyWith({
+    String? socket,
+    String? memoryType,
+    int? powerConsumptionWatts,
+    String? formFactor,
+  }) {
+    return Specifications(
+      socket: socket ?? this.socket,
+      memoryType: memoryType ?? this.memoryType,
+      powerConsumptionWatts: powerConsumptionWatts ?? this.powerConsumptionWatts,
+      formFactor: formFactor ?? this.formFactor,
+    );
+  }
 }

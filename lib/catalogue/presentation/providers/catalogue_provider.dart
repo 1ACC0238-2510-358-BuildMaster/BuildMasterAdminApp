@@ -1,3 +1,4 @@
+import 'package:build_master_adminapp/catalogue/domain/usecases/update_component.dart';
 import 'package:flutter/material.dart';
 import '../../data/models/component_model.dart';
 import '../../domain/entities/component.dart';
@@ -19,6 +20,7 @@ class CatalogueProvider extends ChangeNotifier {
   final DeleteManufacturerUseCase deleteManufacturerUseCase;
   final CreateComponentUseCase _createComponentUseCase;
   final DeleteComponentUseCase _deleteComponentUseCase;
+  final UpdateComponentUseCase _updateComponentUseCase;
 
   CatalogueProvider({
     required this.getComponentsUseCase,
@@ -28,8 +30,10 @@ class CatalogueProvider extends ChangeNotifier {
     required this.deleteManufacturerUseCase,
     required CreateComponentUseCase createComponentUseCase,
     required DeleteComponentUseCase deleteComponentUseCase,
+    required UpdateComponentUseCase updateComponentUseCase
   }):_createComponentUseCase = createComponentUseCase,
-        _deleteComponentUseCase = deleteComponentUseCase;
+        _deleteComponentUseCase = deleteComponentUseCase,
+        _updateComponentUseCase = updateComponentUseCase;
 
   List<Component> components = [];
   List<Category> categories = [];
@@ -118,6 +122,15 @@ class CatalogueProvider extends ChangeNotifier {
     final entity = componentModel.toEntity();
     await _createComponentUseCase(entity);
     await fetchComponents(); // recargar lista
+    notifyListeners();
+  }
+
+  Future<void> updateComponent(Component component) async {
+    if (component.id == null) {
+      throw ArgumentError('Component must have an ID to be updated');
+    }
+    await _updateComponentUseCase(component.id, component);
+    await fetchComponents();
     notifyListeners();
   }
 

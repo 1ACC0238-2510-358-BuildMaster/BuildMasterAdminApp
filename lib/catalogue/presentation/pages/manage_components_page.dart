@@ -4,6 +4,7 @@ import '../../data/models/category_model.dart';
 import '../../data/models/component_model.dart';
 import '../../data/models/manufacturer_model.dart';
 import '../../data/models/specifications_model.dart';
+import '../../domain/entities/component.dart';
 import '../providers/catalogue_provider.dart';
 
 class ManageComponentsPage extends StatefulWidget {
@@ -24,6 +25,87 @@ class _ManageComponentsPageState extends State<ManageComponentsPage> {
 
   int? _selectedCategoryId;
   int? _selectedManufacturerId;
+  int? _editingComponentId; // Nuevo: para controlar si estamos editando
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _typeController.dispose();
+    _socketController.dispose();
+    _memoryTypeController.dispose();
+    _powerController.dispose();
+    _formFactorController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
+
+  // Nuevo método: Cargar datos del componente en el formulario
+  void _loadComponentData(Component component) {
+    _nameController.text = component.name;
+    _typeController.text = component.type;
+    _priceController.text = component.price.toString();
+    _selectedCategoryId = component.category.id;
+    _selectedManufacturerId = component.manufacturer.id;
+    _socketController.text = component.specifications.socket;
+    _memoryTypeController.text = component.specifications.memoryType;
+    _powerController.text = component.specifications.powerConsumptionWatts.toString();
+    _formFactorController.text = component.specifications.formFactor;
+    _editingComponentId = component.id;
+  }
+
+  // Nuevo método: Limpiar el formulario
+  void _clearForm() {
+    _nameController.clear();
+    _typeController.clear();
+    _priceController.clear();
+    _socketController.clear();
+    _memoryTypeController.clear();
+    _powerController.clear();
+    _formFactorController.clear();
+    setState(() {
+      _selectedCategoryId = null;
+      _selectedManufacturerId = null;
+      _editingComponentId = null;
+    });
+  }
+
+  // Método modificado: Ahora maneja tanto creación como actualización
+  Future<void> _saveComponent() async {
+    if (_selectedCategoryId == null || _selectedManufacturerId == null) return;
+
+    final provider = Provider.of<CatalogueProvider>(context, listen: false);
+
+    // Convertir a entidad Component antes de guardar
+    final componentEntity = Component(
+      id: _editingComponentId ?? 0,
+      name: _nameController.text.trim(),
+      type: _typeController.text.trim(),
+      price: double.tryParse(_priceController.text.trim()) ?? 0.0,
+      specifications: Specifications(
+        socket: _socketController.text.trim(),
+        memoryType: _memoryTypeController.text.trim(),
+        powerConsumptionWatts: int.tryParse(_powerController.text.trim()) ?? 0,
+        formFactor: _formFactorController.text.trim(),
+      ),
+      category: provider.categories.firstWhere((c) => c.id == _selectedCategoryId!),
+      manufacturer: provider.manufacturers.firstWhere((m) => m.id == _selectedManufacturerId!),
+    );
+
+    try {
+      if (_editingComponentId != null) {
+        await provider.updateComponent(componentEntity);
+      } else {
+        // Si es creación, usa el método que espera ComponentModel
+        final componentModel = ComponentModel.fromEntity(componentEntity);
+        await provider.createComponent(componentModel);
+      }
+      _clearForm();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +114,17 @@ class _ManageComponentsPageState extends State<ManageComponentsPage> {
     final manufacturers = provider.manufacturers;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Administrar Componentes')),
+      appBar: AppBar(
+        title: const Text('Administrar Componentes'),
+        actions: [
+          if (_editingComponentId != null)
+            IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: _clearForm,
+              tooltip: 'Cancelar edición',
+            ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -94,43 +186,8 @@ class _ManageComponentsPageState extends State<ManageComponentsPage> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () async {
-                  if (_selectedCategoryId == null || _selectedManufacturerId == null) return;
-
-                  final component = ComponentModel(
-                    id: 0,
-                    name: _nameController.text.trim(),
-                    type: _typeController.text.trim(),
-                    price: double.tryParse(_priceController.text.trim()) ?? 0.0,
-                    category: CategoryModel.fromEntity(
-                        provider.categories.firstWhere((c) => c.id == _selectedCategoryId!)
-                    ),
-                    manufacturer: ManufacturerModel.fromEntity(
-                        provider.manufacturers.firstWhere((m) => m.id == _selectedManufacturerId!)
-                    ),
-                    specifications: SpecificationsModel(
-                      socket: _socketController.text.trim(),
-                      memoryType: _memoryTypeController.text.trim(),
-                      powerConsumptionWatts: int.tryParse(_powerController.text.trim()) ?? 0,
-                      formFactor: _formFactorController.text.trim(),
-                    ),
-                  );
-
-                  await provider.createComponent(component);
-
-                  _nameController.clear();
-                  _typeController.clear();
-                  _priceController.clear();
-                  _socketController.clear();
-                  _memoryTypeController.clear();
-                  _powerController.clear();
-                  _formFactorController.clear();
-                  setState(() {
-                    _selectedCategoryId = null;
-                    _selectedManufacturerId = null;
-                  });
-                },
-                child: const Text('Agregar Componente'),
+                onPressed: _saveComponent,
+                child: Text(_editingComponentId != null ? 'Actualizar Componente' : 'Agregar Componente'),
               ),
               const SizedBox(height: 24),
               const Divider(),
@@ -140,10 +197,19 @@ class _ManageComponentsPageState extends State<ManageComponentsPage> {
               ...provider.components.map(
                     (comp) => ListTile(
                   title: Text(comp.name),
-                  subtitle: Text('Tipo: ${comp.type}'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => provider.deleteComponent(comp.id),
+                  subtitle: Text('Tipo: ${comp.type} - Precio: \$${comp.price}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () => _loadComponentData(comp),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => provider.deleteComponent(comp.id),
+                      ),
+                    ],
                   ),
                 ),
               ),

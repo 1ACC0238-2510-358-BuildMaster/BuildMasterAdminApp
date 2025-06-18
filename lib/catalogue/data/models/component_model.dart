@@ -68,4 +68,5 @@ class ComponentModel {
       manufacturer: ManufacturerModel.fromEntity(entity.manufacturer),
     );
   }
+
 }

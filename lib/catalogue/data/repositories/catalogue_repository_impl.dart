@@ -46,7 +46,8 @@ class CatalogueRepositoryImpl implements CatalogueRepository {
 
   @override
   Future<void> updateComponent(int id, Component component) async {
-    await componentService.updateComponent(id, component as ComponentModel);
+    final componentModel = ComponentModel.fromEntity(component);
+    await componentService.updateComponent(id, componentModel);
   }
 
   @override

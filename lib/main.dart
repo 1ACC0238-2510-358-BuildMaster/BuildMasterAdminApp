@@ -1,3 +1,4 @@
+import 'package:build_master_adminapp/catalogue/domain/usecases/update_component.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'catalogue/data/datasources/component_api_service.dart';
@@ -38,6 +39,7 @@ void main() {
             deleteManufacturerUseCase: DeleteManufacturerUseCase(catalogueRepository),
             createComponentUseCase: CreateComponentUseCase(catalogueRepository),
             deleteComponentUseCase: DeleteComponentUseCase(catalogueRepository),
+            updateComponentUseCase: UpdateComponentUseCase(catalogueRepository)
           )..loadInitialData(),
         ),
         ChangeNotifierProvider(
