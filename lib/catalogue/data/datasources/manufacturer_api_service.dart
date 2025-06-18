@@ -6,7 +6,7 @@ import '../models/manufacturer_model.dart';
 class ManufacturerApiService {
   final String baseUrl;
 
-  ManufacturerApiService({this.baseUrl = 'http://10.0.2.2:8080/api/manufacturers'});
+  ManufacturerApiService({this.baseUrl = 'https://backend-5l98.onrender.com/api/manufacturers'});
 
   /// GET /api/manufacturers
   Future<List<ManufacturerModel>> fetchManufacturers() async {

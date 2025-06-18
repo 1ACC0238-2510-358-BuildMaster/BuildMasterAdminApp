@@ -40,5 +40,12 @@ class ManufacturerModel extends Manufacturer {
     );
   }
 
-  Manufacturer toEntity() => this;
+  Manufacturer toEntity() {
+    return Manufacturer(
+      id: id,
+      name: name,
+      website: website,
+      supportEmail: supportEmail,
+    );
+  }
 }

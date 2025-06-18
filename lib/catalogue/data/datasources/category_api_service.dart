@@ -6,14 +6,14 @@ import '../models/category_model.dart';
 class CategoryApiService {
   final String baseUrl;
 
-  CategoryApiService({this.baseUrl = 'http://10.0.2.2:8080/api/categories'});
+  CategoryApiService({this.baseUrl = 'https://backend-5l98.onrender.com/api/categories'});
 
   /// GET /api/categories
   Future<List<CategoryModel>> fetchCategories() async {
     final response = await http.get(Uri.parse(baseUrl));
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
+      final List<dynamic> jsonList = json.decode(utf8.decode(response.bodyBytes));
       return jsonList.map((json) => CategoryModel.fromJson(json)).toList();
     } else {
       throw Exception('Error al obtener categorías: ${response.statusCode}');
