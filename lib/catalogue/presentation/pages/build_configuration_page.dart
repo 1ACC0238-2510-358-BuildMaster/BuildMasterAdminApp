@@ -21,6 +21,7 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
       if (provider.categories.isEmpty) {
         provider.loadInitialData();
       }
+      provider.loadInitialData();
     });
   }
 
