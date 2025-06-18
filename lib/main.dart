@@ -19,6 +19,7 @@ import 'catalogue/presentation/pages/manage_manufacturers_page.dart';
 import 'catalogue/presentation/providers/catalogue_provider.dart';
 import 'catalogue/presentation/providers/build_provider.dart';
 import 'catalogue/presentation/pages/build_configuration_page.dart';
+import '../dashboard_page.dart';
 
 void main() {
   final catalogueRepository = CatalogueRepositoryImpl(
@@ -79,6 +80,7 @@ class MyApp extends StatelessWidget {
           textColor: Colors.black,
         ),
       ),
+      home: const DashboardPage(),
       initialRoute: '/',
       routes: {
         '/': (context) => const BuildConfiguratorPage(),
