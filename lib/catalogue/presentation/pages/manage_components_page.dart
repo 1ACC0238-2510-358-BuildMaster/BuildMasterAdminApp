@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../data/models/category_model.dart';
 import '../../data/models/component_model.dart';
-import '../../data/models/manufacturer_model.dart';
-import '../../data/models/specifications_model.dart';
 import '../../domain/entities/component.dart';
 import '../providers/catalogue_provider.dart';
 
@@ -26,6 +23,16 @@ class _ManageComponentsPageState extends State<ManageComponentsPage> {
   int? _selectedCategoryId;
   int? _selectedManufacturerId;
   int? _editingComponentId; // Nuevo: para controlar si estamos editando
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<CatalogueProvider>(context, listen: false);
+      provider.loadInitialData(); // Ya la tienes
+      provider.clearFilters();
+    });
+  }
 
   @override
   void dispose() {
@@ -110,6 +117,13 @@ class _ManageComponentsPageState extends State<ManageComponentsPage> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<CatalogueProvider>(context);
+
+    if (provider.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final categories = provider.categories;
     final manufacturers = provider.manufacturers;
 

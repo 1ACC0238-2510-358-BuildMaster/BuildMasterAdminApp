@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
         '/admin': (context) => const AdminPanelPage(),
         '/admin/categories': (context) => const ManageCategoriesPage(),
         '/admin/manufacturers': (context) => const ManageManufacturersPage(),
-        '/admin/components': (context) => const BuildConfiguratorPage(),
+        '/admin/components': (context) => const ManageComponentsPage(),
       },
     );
   }
