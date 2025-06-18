@@ -20,7 +20,7 @@ class SearchField extends StatelessWidget {
           labelText: 'Buscar por nombre',
           border: OutlineInputBorder(),
         ),
-        onChanged: (value) => onChanged(value.toLowerCase()),
+        onChanged: onChanged,
       ),
     );
   }

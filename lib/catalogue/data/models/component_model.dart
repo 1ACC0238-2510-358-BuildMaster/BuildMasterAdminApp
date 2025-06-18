@@ -36,12 +36,13 @@ class ComponentModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'type': type,
       'price': price,
       'specifications': specifications.toJson(),
-      'categoryId': category.id,
-      'manufacturerId': manufacturer.id,
+      'category': category.toJson(),
+      'manufacturer': manufacturer.toJson(),
     };
   }
 
@@ -68,5 +69,4 @@ class ComponentModel {
       manufacturer: ManufacturerModel.fromEntity(entity.manufacturer),
     );
   }
-
 }

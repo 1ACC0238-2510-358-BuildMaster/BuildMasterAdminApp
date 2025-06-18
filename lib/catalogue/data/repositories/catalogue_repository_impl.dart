@@ -46,8 +46,7 @@ class CatalogueRepositoryImpl implements CatalogueRepository {
 
   @override
   Future<void> updateComponent(int id, Component component) async {
-    final componentModel = ComponentModel.fromEntity(component);
-    await componentService.updateComponent(id, componentModel);
+    await componentService.updateComponent(id, component as ComponentModel);
   }
 
   @override
@@ -63,9 +62,7 @@ class CatalogueRepositoryImpl implements CatalogueRepository {
 
   @override
   Future<Manufacturer> createManufacturer(Manufacturer manufacturer) async {
-    final model = ManufacturerModel.fromEntity(manufacturer); // ✅ conversión correcta
-    final response = await manufacturerService.createManufacturer(model); // este debe retornar ManufacturerModel
-    return response.toEntity(); // lo conviertes de vuelta a entidad
+    return await manufacturerService.createManufacturer(manufacturer as ManufacturerModel);
   }
 
   @override
