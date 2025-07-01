@@ -62,7 +62,7 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Componentes seleccionados:',
+                      'Categorias de componentes:',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     TextButton.icon(
@@ -78,7 +78,7 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
                     )
                   ],
                 ),
-                const SizedBox(height: 4),
+                /*const SizedBox(height: 4),
                 if (buildProvider.selectedComponents.isEmpty)
                   const Text('No se ha seleccionado ningún componente.')
                 else
@@ -92,7 +92,7 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
                         backgroundColor: Colors.green.shade100,
                       );
                     }).toList(),
-                  ),
+                  ),*/
               ],
             ),
           ),
@@ -149,6 +149,27 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 60), // Aumenta el valor para subirlo más
+        child: FloatingActionButton.extended(
+          onPressed: () async {
+            if (buildProvider.selectedComponents.length < 8) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Selecciona los 8 componentes antes de guardar.')),
+              );
+              return;
+            }
+
+            await buildProvider.saveBuild();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Build enviada al backend 🚀')),
+            );
+          },
+          icon: const Icon(Icons.save),
+          label: const Text('Guardar Build'),
+          backgroundColor: Colors.green,
+        ),
       ),
     );
   }

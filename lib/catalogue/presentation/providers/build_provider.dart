@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../data/models/build_model.dart';
-
+import '../../data/datasources/build_api_service.dart';
 class BuildProvider extends ChangeNotifier {
   BuildModel _currentBuild = BuildModel();
-
+  final BuildApiService apiService;
+  BuildProvider({required this.apiService});
   BuildModel get currentBuild => _currentBuild;
 
   void selectComponent(int categoryId, int componentId) {
@@ -30,6 +31,16 @@ class BuildProvider extends ChangeNotifier {
   void resetBuild() {
     _currentBuild.clear();
     notifyListeners();
+  }
+  Future<void> saveBuild() async {
+    final ids = _currentBuild.selectedComponents.values.toList();
+    final response = await apiService.createBuild(ids);
+
+    if (response.statusCode == 200) {
+      debugPrint('Build guardado correctamente: ${response.body}');
+    } else {
+      debugPrint('Error al guardar build: ${response.statusCode} ${response.body}');
+    }
   }
 }
 

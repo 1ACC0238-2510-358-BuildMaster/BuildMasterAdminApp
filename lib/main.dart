@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'catalogue/data/datasources/component_api_service.dart';
 import 'catalogue/data/datasources/category_api_service.dart';
 import 'catalogue/data/datasources/manufacturer_api_service.dart';
+import 'catalogue/data/datasources/build_api_service.dart';
 import 'catalogue/data/repositories/catalogue_repository_impl.dart';
 import 'catalogue/domain/usecases/get_components.dart';
 import 'catalogue/domain/usecases/get_categories.dart';
@@ -27,6 +28,7 @@ void main() {
     categoryService: CategoryApiService(),
     manufacturerService: ManufacturerApiService(),
   );
+  final buildApiService = BuildApiService();
 
   runApp(
     MultiProvider(
@@ -44,7 +46,7 @@ void main() {
           )..loadInitialData(),
         ),
         ChangeNotifierProvider(
-          create: (_) => BuildProvider(),
+          create: (_) => BuildProvider(apiService: buildApiService),
         ),
       ],
       child: const MyApp(),
