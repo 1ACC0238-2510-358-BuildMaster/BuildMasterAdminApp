@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../data/models/build_model.dart';
 import '../../data/datasources/build_api_service.dart';
+import '../../../core/shared_preferences_helper.dart';
+import 'dart:convert';
+
 class BuildProvider extends ChangeNotifier {
   BuildModel _currentBuild = BuildModel();
   final BuildApiService apiService;
@@ -38,6 +41,11 @@ class BuildProvider extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       debugPrint('Build guardado correctamente: ${response.body}');
+
+      final decoded = json.decode(response.body);
+      final buildId = decoded['id'].toString();
+
+      await SharedPrefsHelper.saveBuildId(buildId);
     } else {
       debugPrint('Error al guardar build: ${response.statusCode} ${response.body}');
     }
