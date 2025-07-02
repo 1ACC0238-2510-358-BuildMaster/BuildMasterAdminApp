@@ -1,6 +1,7 @@
 import 'package:build_master_adminapp/catalogue/presentation/pages/admin_panel_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart'; //
 import 'catalogue/data/datasources/component_api_service.dart';
 import 'catalogue/data/datasources/category_api_service.dart';
 import 'catalogue/data/datasources/manufacturer_api_service.dart';
@@ -22,7 +23,12 @@ import 'catalogue/domain/usecases/delete_manufacturer.dart';
 import 'catalogue/domain/usecases/update_component.dart';
 import 'dashboard_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  //Limpia los builds guardados al iniciar la app
+  //final prefs = await SharedPreferences.getInstance();
+  //await prefs.remove('saved_builds');
   final catalogueRepository = CatalogueRepositoryImpl(
     componentService: ComponentApiService(),
     categoryService: CategoryApiService(),

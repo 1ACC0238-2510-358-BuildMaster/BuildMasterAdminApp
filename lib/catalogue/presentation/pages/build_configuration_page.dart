@@ -4,6 +4,7 @@ import '../providers/catalogue_provider.dart';
 import '../providers/build_provider.dart';
 import 'catalogue_page.dart';
 import 'admin_panel_page.dart';
+import 'saved_builds_page.dart';
 
 class BuildConfiguratorPage extends StatefulWidget {
   const BuildConfiguratorPage({super.key});
@@ -151,24 +152,43 @@ class _BuildConfiguratorPageState extends State<BuildConfiguratorPage> {
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 60), // Aumenta el valor para subirlo más
-        child: FloatingActionButton.extended(
-          onPressed: () async {
-            if (buildProvider.selectedComponents.length < 8) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Selecciona los 8 componentes antes de guardar.')),
-              );
-              return;
-            }
+        padding: const EdgeInsets.only(bottom: 60),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton.extended(
+              heroTag: 'save_build_btn',
+              onPressed: () async {
+                if (buildProvider.selectedComponents.length < 8) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Selecciona los 8 componentes antes de guardar.')),
+                  );
+                  return;
+                }
 
-            await buildProvider.saveBuild();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Build enviada al backend 🚀')),
-            );
-          },
-          icon: const Icon(Icons.save),
-          label: const Text('Guardar Build'),
-          backgroundColor: Colors.green,
+                await buildProvider.saveBuild();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Build enviada al backend')),
+                );
+              },
+              icon: const Icon(Icons.save),
+              label: const Text('Guardar Build'),
+              backgroundColor: Colors.green,
+            ),
+            const SizedBox(height: 16),
+            FloatingActionButton.extended(
+              heroTag: 'view_builds_btn',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SavedBuildsPage()),
+                );
+              },
+              icon: const Icon(Icons.list),
+              label: const Text('Ver Builds Guardadas'),
+              backgroundColor: Colors.blue,
+            ),
+          ],
         ),
       ),
     );

@@ -14,4 +14,28 @@ class BuildApiService {
     );
     return response;
   }
+  Future<Map<String, dynamic>> getBuildById(int id) async {
+    final response = await http.get(Uri.parse('$baseUrl/$id'));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('No se pudo obtener build $id');
+    }
+  }
+
+  Future<Map<String, dynamic>> getBuildResult(int id) async {
+    final response = await http.get(Uri.parse('$baseUrl/$id/result'));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('No se pudo obtener resultado de build $id');
+    }
+  }
+  Future<void> deleteBuild(int id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/$id'));
+    if (response.statusCode != 200) {
+      throw Exception('No se pudo eliminar la build $id del backend.');
+    }
+  }
+
 }
