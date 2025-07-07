@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class BuildApiService {
   final String baseUrl;
 
-  BuildApiService({this.baseUrl = 'http://10.0.2.2:8080/api/builds'});
+  BuildApiService({this.baseUrl = 'https://backend-5l98.onrender.com/api/builds'});
 
   Future<http.Response> createBuild(List<int> componentIds) async {
     final response = await http.post(
