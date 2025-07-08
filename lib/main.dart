@@ -26,6 +26,7 @@ import 'user/presentation/pages/user_profile_page.dart';
 import 'user/presentation/providers/user_provider.dart';
 import 'root_page.dart';
 import 'community/presentation/providers/community_provider.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,8 @@ Future<void> main() async {
   //Limpia los builds guardados al iniciar la app
   //final prefs = await SharedPreferences.getInstance();
   //await prefs.remove('saved_builds');
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
   final catalogueRepository = CatalogueRepositoryImpl(
     componentService: ComponentApiService(),
     categoryService: CategoryApiService(),
