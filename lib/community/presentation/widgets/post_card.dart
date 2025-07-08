@@ -24,7 +24,7 @@ class PostCard extends StatelessWidget {
       child: ListTile(
         leading: const Icon(Icons.forum, color: Colors.green),
         title: Text(post.title),
-        subtitle: Text('Por: ${post.author}'),
+        subtitle: Text('Por: ${post.username}'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
