@@ -1,7 +1,6 @@
 import 'package:build_master_adminapp/catalogue/presentation/pages/admin_panel_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart'; //
 import 'catalogue/data/datasources/component_api_service.dart';
 import 'catalogue/data/datasources/category_api_service.dart';
 import 'catalogue/data/datasources/manufacturer_api_service.dart';
@@ -12,7 +11,6 @@ import 'catalogue/domain/usecases/get_categories.dart';
 import 'catalogue/domain/usecases/get_manufacturers.dart';
 import 'catalogue/presentation/providers/catalogue_provider.dart';
 import 'catalogue/presentation/providers/build_provider.dart';
-import 'catalogue/presentation/pages/build_configuration_page.dart';
 import 'catalogue/presentation/pages/manage_categories_page.dart';
 import 'catalogue/presentation/pages/manage_components_page.dart';
 import 'catalogue/presentation/pages/manage_manufacturers_page.dart';
@@ -22,6 +20,12 @@ import 'catalogue/domain/usecases/delete_component.dart';
 import 'catalogue/domain/usecases/delete_manufacturer.dart';
 import 'catalogue/domain/usecases/update_component.dart';
 import 'dashboard_page.dart';
+import 'user/presentation/pages/user_login_page.dart';
+import 'user/presentation/pages/user_register_page.dart';
+import 'user/presentation/pages/user_profile_page.dart';
+import 'user/presentation/providers/user_provider.dart';
+import 'root_page.dart';
+import 'community/presentation/providers/community_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +44,9 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
+          create: (_) => CommunityProvider(),
+        ),
+        ChangeNotifierProvider(
           create: (_) => CatalogueProvider(
               getComponentsUseCase: GetComponentsUseCase(catalogueRepository),
               getCategoriesUseCase: GetCategoriesUseCase(catalogueRepository),
@@ -53,6 +60,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => BuildProvider(apiService: buildApiService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserProvider(),
         ),
       ],
       child: const MyApp(),
@@ -90,11 +100,14 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const DashboardPage(),
+        '/': (context) => const RootPage(),
         '/admin': (context) => const AdminPanelPage(),
         '/admin/categories': (context) => const ManageCategoriesPage(),
         '/admin/manufacturers': (context) => const ManageManufacturersPage(),
         '/admin/components': (context) => const ManageComponentsPage(),
+        '/login': (context) => const UserLoginPage(),
+        '/register': (context) => const UserRegisterPage(),
+        '/profile': (context) => const UserProfilePage(),
       },
     );
   }

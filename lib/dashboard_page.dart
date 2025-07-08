@@ -1,7 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../catalogue/presentation/pages/build_configuration_page.dart';
 import '../community/presentation/community_page.dart';
+import '../community/presentation/pages/favorites_page.dart';
 import '../provider/presentation/pages/provider_screen.dart';
+import '../glosary/presentation/glosary_page.dart';
+import 'user/presentation/providers/user_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -16,10 +21,10 @@ class _DashboardPageState extends State<DashboardPage> {
   final List<Widget> _pages = [
     // Home dashboard
     _DashboardGrid(),
-    // Favoritos (puedes personalizar)
-    Center(child: Text('Favoritos', style: TextStyle(fontSize: 24))),
+    // Favoritos
+    const FavoritesPage(),
     // Búsqueda
-    Center(child: Text('Busqueda', style: TextStyle(fontSize: 24))),
+    const GlosaryPage(),
     // Configuración
     BuildConfiguratorPage(),
     // Comunidad
@@ -36,11 +41,32 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    // Redirect to login if not authenticated
+    if (userProvider.token == null) {
+      Future.microtask(() => Navigator.of(context).pushReplacementNamed('/login'));
+      return const SizedBox.shrink();
+    }
+    String greetingName = '¡ADMIN!';
+    if (userProvider.username != null && userProvider.username!.isNotEmpty) {
+      greetingName = userProvider.username!;
+    } else if (userProvider.email != null && userProvider.email!.isNotEmpty) {
+      final email = userProvider.email!;
+      greetingName = email.contains('@') ? email.split('@')[0] : email;
+    }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hola, ¡ADMIN!', style: TextStyle(fontSize: 26)),
+        title: Text('Hola, $greetingName!', style: const TextStyle(fontSize: 22)),
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person, color: Colors.green),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/profile');
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -101,7 +127,7 @@ class _DashboardGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       _DashboardItem(Icons.person, 'Mi Perfil', () {
-        // Puedes cambiar a la vista de perfil si lo deseas
+        Navigator.of(context).pushNamed('/profile');
       }),
       _DashboardItem(Icons.favorite, 'Favoritos', () {
         final state = context.findAncestorStateOfType<_DashboardPageState>();

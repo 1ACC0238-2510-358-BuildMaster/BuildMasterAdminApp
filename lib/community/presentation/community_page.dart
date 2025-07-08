@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/community_provider.dart';
 import 'pages/moderation_screen.dart';
 import 'pages/post_management_screen.dart';
 import 'pages/settings_screen.dart';
@@ -27,27 +29,30 @@ class _CommunityPageState extends State<CommunityPage> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Comunidad'),
-        backgroundColor: Colors.green,
-        bottom: TabBar(
+    return ChangeNotifierProvider(
+      create: (_) => CommunityProvider(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Comunidad'),
+          backgroundColor: Colors.green,
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: Colors.white,
+            tabs: const [
+              Tab(icon: Icon(Icons.report), text: 'Moderación'),
+              Tab(icon: Icon(Icons.forum), text: 'Posts'),
+              Tab(icon: Icon(Icons.settings), text: 'Ajustes'),
+            ],
+          ),
+        ),
+        body: TabBarView(
           controller: _tabController,
-          indicatorColor: Colors.white,
-          tabs: const [
-            Tab(icon: Icon(Icons.report), text: 'Moderación'),
-            Tab(icon: Icon(Icons.forum), text: 'Posts'),
-            Tab(icon: Icon(Icons.settings), text: 'Ajustes'),
+          children: const [
+            ModerationScreen(),
+            PostManagementScreen(),
+            SettingsScreen(),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          ModerationScreen(),
-          PostManagementScreen(),
-          SettingsScreen(),
-        ],
       ),
     );
   }
