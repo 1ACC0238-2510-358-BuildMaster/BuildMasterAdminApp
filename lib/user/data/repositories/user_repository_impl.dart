@@ -12,7 +12,7 @@ class UserRepositoryImpl {
     required String email,
     required String username,
     required String password,
-    String role = 'USER',
+    String role = 'ADMIN',
   }) async {
     return await apiService.register(
       email: email,

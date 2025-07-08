@@ -8,7 +8,7 @@ class RegisterUser {
     required String email,
     required String username,
     required String password,
-    String role = 'USER',
+    String role = 'ADMIN',
   }) async {
     return await repository.register(
       email: email,

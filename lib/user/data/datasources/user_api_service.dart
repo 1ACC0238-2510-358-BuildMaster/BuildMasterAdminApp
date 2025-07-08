@@ -18,7 +18,7 @@ class UserApiService {
     required String email,
     required String username,
     required String password,
-    String role = 'USER',
+    String role = 'ADMIN',
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/users/register'),

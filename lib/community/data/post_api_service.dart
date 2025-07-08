@@ -117,28 +117,54 @@ class PostApiService {
   }
 
   Future<void> deletePost(int id, {String? token}) async {
+    print('TOKEN ENVIADO deletePost: $token');
+
     final headers = <String, String>{
+      'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
+
+    final url = Uri.parse('$baseUrl/posts/$id');
+    print('DELETE Post URL: $url');
+    print('DELETE Post Headers: $headers');
+
     final response = await http.delete(
-      Uri.parse('$baseUrl/posts/$id'),
+      url,
       headers: headers,
     );
-    if (response.statusCode != 204) {
-      throw Exception('Failed to delete post');
+
+    print('DELETE Post Status Code: ${response.statusCode}');
+    print('DELETE Post Response Body: ${response.body}');
+
+    if (response.statusCode != 204 && response.statusCode != 200) {
+      throw Exception('Failed to delete post: Status ${response.statusCode}, Body: ${response.body}');
     }
   }
 
   Future<void> deleteComment(int postId, int commentId, {String? token}) async {
+    print('TOKEN ENVIADO deleteComment: $token');
+    print('Attempting to delete comment $commentId from post $postId');
+
     final headers = <String, String>{
+      'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
+
+    // Usar la estructura correcta del backend
+    final url = Uri.parse('$baseUrl/posts/$postId/comment/$commentId');
+    print('DELETE Comment URL: $url');
+    print('DELETE Comment Headers: $headers');
+
     final response = await http.delete(
-      Uri.parse('$baseUrl/posts/$postId/comment/$commentId'),
+      url,
       headers: headers,
     );
+
+    print('DELETE Comment Status Code: ${response.statusCode}');
+    print('DELETE Comment Response Body: ${response.body}');
+
     if (response.statusCode != 204 && response.statusCode != 200) {
-      throw Exception('Failed to delete comment');
+      throw Exception('Failed to delete comment: Status ${response.statusCode}, Body: ${response.body}');
     }
   }
 }

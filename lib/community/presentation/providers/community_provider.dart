@@ -232,12 +232,22 @@ class CommunityProvider extends ChangeNotifier {
       }
 
       print('TOKEN ENVIADO deleteComment: ' + (accessToken ?? 'NULL'));
+      print('Attempting to delete comment $commentId from post $postId');
       await _apiService.deleteComment(postId, commentId, token: accessToken);
+      print('Comment deleted successfully');
       // Refrescar los posts para reflejar el cambio
       await fetchPosts();
     } catch (e) {
+      print('ERROR deleteComment: $e');
       _error = e.toString();
       notifyListeners();
+      // Mostrar el error al usuario
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al eliminar comentario: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 }
