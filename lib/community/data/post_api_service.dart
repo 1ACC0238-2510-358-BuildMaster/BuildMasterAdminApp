@@ -116,16 +116,26 @@ class PostApiService {
     }
   }
 
-  Future<void> deletePost(int id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/posts/$id'));
+  Future<void> deletePost(int id, {String? token}) async {
+    final headers = <String, String>{
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.delete(
+      Uri.parse('$baseUrl/posts/$id'),
+      headers: headers,
+    );
     if (response.statusCode != 204) {
       throw Exception('Failed to delete post');
     }
   }
 
-  Future<void> deleteComment(int postId, int commentId) async {
+  Future<void> deleteComment(int postId, int commentId, {String? token}) async {
+    final headers = <String, String>{
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
     final response = await http.delete(
       Uri.parse('$baseUrl/posts/$postId/comment/$commentId'),
+      headers: headers,
     );
     if (response.statusCode != 204 && response.statusCode != 200) {
       throw Exception('Failed to delete comment');

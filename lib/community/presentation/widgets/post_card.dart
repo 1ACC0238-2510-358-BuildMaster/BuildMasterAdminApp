@@ -113,7 +113,7 @@ class PostCard extends StatelessWidget {
                             child: IconButton(
                               icon: const Icon(Icons.delete_forever, color: Colors.red),
                               onPressed: () async {
-                                await Provider.of<CommunityProvider>(context, listen: false).deleteComment(post.id, c.id);
+                                await Provider.of<CommunityProvider>(context, listen: false).deleteComment(post.id, c.id, context);
                               },
                             ),
                           ),

@@ -65,9 +65,20 @@ class CommunityProvider extends ChangeNotifier {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final rawToken = userProvider.token;
       String? accessToken;
+
       if (rawToken != null) {
-        // Si el token es un JSON con access_token, extraerlo
-        if (rawToken.trim().startsWith('{') && rawToken.contains('access_token')) {
+        // Si el token es un String que contiene access_token, extraerlo
+        if (rawToken.contains('access_token:')) {
+          // Extraer solo el valor del access_token del formato {access_token:..., token_type:...}
+          final tokenStart = rawToken.indexOf('access_token:') + 'access_token:'.length;
+          final tokenEnd = rawToken.indexOf(',', tokenStart);
+          if (tokenEnd != -1) {
+            accessToken = rawToken.substring(tokenStart, tokenEnd);
+          } else {
+            // Si no hay coma, tomar hasta el final menos la llave
+            accessToken = rawToken.substring(tokenStart, rawToken.length - 1);
+          }
+        } else if (rawToken.trim().startsWith('{') && rawToken.contains('access_token')) {
           try {
             final decoded = jsonDecode(rawToken);
             if (decoded is Map && decoded['access_token'] is String) {
@@ -81,6 +92,7 @@ class CommunityProvider extends ChangeNotifier {
           accessToken = rawToken;
         }
       }
+
       print('TOKEN ENVIADO updatePost: ' + (accessToken ?? 'NULL'));
       await _apiService.updatePost(postId, title, content, mediaUrls, token: accessToken);
       await fetchPosts();
@@ -95,9 +107,20 @@ class CommunityProvider extends ChangeNotifier {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final rawToken = userProvider.token;
       String? accessToken;
+
       if (rawToken != null) {
-        // Si el token es un JSON con access_token, extraerlo
-        if (rawToken.trim().startsWith('{') && rawToken.contains('access_token')) {
+        // Si el token es un String que contiene access_token, extraerlo
+        if (rawToken.contains('access_token:')) {
+          // Extraer solo el valor del access_token del formato {access_token:..., token_type:...}
+          final tokenStart = rawToken.indexOf('access_token:') + 'access_token:'.length;
+          final tokenEnd = rawToken.indexOf(',', tokenStart);
+          if (tokenEnd != -1) {
+            accessToken = rawToken.substring(tokenStart, tokenEnd);
+          } else {
+            // Si no hay coma, tomar hasta el final menos la llave
+            accessToken = rawToken.substring(tokenStart, rawToken.length - 1);
+          }
+        } else if (rawToken.trim().startsWith('{') && rawToken.contains('access_token')) {
           try {
             final decoded = jsonDecode(rawToken);
             if (decoded is Map && decoded['access_token'] is String) {
@@ -111,6 +134,7 @@ class CommunityProvider extends ChangeNotifier {
           accessToken = rawToken;
         }
       }
+
       print('TOKEN ENVIADO updateComment: ' + (accessToken ?? 'NULL'));
       await _apiService.updateComment(postId, commentId, content, token: accessToken);
       await fetchPosts();
@@ -120,9 +144,41 @@ class CommunityProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> deletePost(int id) async {
+  Future<void> deletePost(int id, BuildContext context) async {
     try {
-      await _apiService.deletePost(id);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final rawToken = userProvider.token;
+      String? accessToken;
+
+      if (rawToken != null) {
+        // Si el token es un String que contiene access_token, extraerlo
+        if (rawToken.contains('access_token:')) {
+          // Extraer solo el valor del access_token del formato {access_token:..., token_type:...}
+          final tokenStart = rawToken.indexOf('access_token:') + 'access_token:'.length;
+          final tokenEnd = rawToken.indexOf(',', tokenStart);
+          if (tokenEnd != -1) {
+            accessToken = rawToken.substring(tokenStart, tokenEnd);
+          } else {
+            // Si no hay coma, tomar hasta el final menos la llave
+            accessToken = rawToken.substring(tokenStart, rawToken.length - 1);
+          }
+        } else if (rawToken.trim().startsWith('{') && rawToken.contains('access_token')) {
+          try {
+            final decoded = jsonDecode(rawToken);
+            if (decoded is Map && decoded['access_token'] is String) {
+              accessToken = decoded['access_token'] as String;
+            }
+          } catch (_) {
+            accessToken = null;
+          }
+        } else {
+          // Si es un token plano (JWT o similar), usarlo directamente
+          accessToken = rawToken;
+        }
+      }
+
+      print('TOKEN ENVIADO deletePost: ' + (accessToken ?? 'NULL'));
+      await _apiService.deletePost(id, token: accessToken);
       _posts.removeWhere((p) => p.id == id);
       notifyListeners();
     } catch (e) {
@@ -142,9 +198,41 @@ class CommunityProvider extends ChangeNotifier {
 
   bool isFavorite(Post post) => _favoritePosts.contains(post);
 
-  Future<void> deleteComment(int postId, int commentId) async {
+  Future<void> deleteComment(int postId, int commentId, BuildContext context) async {
     try {
-      await _apiService.deleteComment(postId, commentId);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final rawToken = userProvider.token;
+      String? accessToken;
+
+      if (rawToken != null) {
+        // Si el token es un String que contiene access_token, extraerlo
+        if (rawToken.contains('access_token:')) {
+          // Extraer solo el valor del access_token del formato {access_token:..., token_type:...}
+          final tokenStart = rawToken.indexOf('access_token:') + 'access_token:'.length;
+          final tokenEnd = rawToken.indexOf(',', tokenStart);
+          if (tokenEnd != -1) {
+            accessToken = rawToken.substring(tokenStart, tokenEnd);
+          } else {
+            // Si no hay coma, tomar hasta el final menos la llave
+            accessToken = rawToken.substring(tokenStart, rawToken.length - 1);
+          }
+        } else if (rawToken.trim().startsWith('{') && rawToken.contains('access_token')) {
+          try {
+            final decoded = jsonDecode(rawToken);
+            if (decoded is Map && decoded['access_token'] is String) {
+              accessToken = decoded['access_token'] as String;
+            }
+          } catch (_) {
+            accessToken = null;
+          }
+        } else {
+          // Si es un token plano (JWT o similar), usarlo directamente
+          accessToken = rawToken;
+        }
+      }
+
+      print('TOKEN ENVIADO deleteComment: ' + (accessToken ?? 'NULL'));
+      await _apiService.deleteComment(postId, commentId, token: accessToken);
       // Refrescar los posts para reflejar el cambio
       await fetchPosts();
     } catch (e) {

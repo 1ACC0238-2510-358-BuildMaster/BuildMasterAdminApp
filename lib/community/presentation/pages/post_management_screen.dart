@@ -85,7 +85,7 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
                 }
               },
               onDelete: () async {
-                await provider.deletePost(post.id);
+                await provider.deletePost(post.id, context);
               },
             );
           },
