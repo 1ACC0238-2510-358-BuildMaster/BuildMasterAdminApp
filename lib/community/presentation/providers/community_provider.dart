@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/post.dart';
 import '../../data/post_api_service.dart';
+import '../../../user/presentation/providers/user_provider.dart';
+import 'dart:convert';
 
 class CommunityProvider extends ChangeNotifier {
   final List<Post> _favoritePosts = [];
@@ -55,14 +58,62 @@ class CommunityProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updatePost(int id, String title, String content, List<String> mediaUrls) async {
+  Future<void> updatePost(dynamic id, String title, String content, List<String> mediaUrls, BuildContext context) async {
     try {
-      final updated = await _apiService.updatePost(id, title, content, mediaUrls);
-      final idx = _posts.indexWhere((p) => p.id == id);
-      if (idx != -1) {
-        _posts[idx] = updated;
-        notifyListeners();
+      // Convertir id a int si es String
+      final int postId = id is int ? id : int.parse(id.toString());
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final rawToken = userProvider.token;
+      String? accessToken;
+      if (rawToken != null) {
+        // Si el token es un JSON con access_token, extraerlo
+        if (rawToken.trim().startsWith('{') && rawToken.contains('access_token')) {
+          try {
+            final decoded = jsonDecode(rawToken);
+            if (decoded is Map && decoded['access_token'] is String) {
+              accessToken = decoded['access_token'] as String;
+            }
+          } catch (_) {
+            accessToken = null;
+          }
+        } else {
+          // Si es un token plano (JWT o similar), usarlo directamente
+          accessToken = rawToken;
+        }
       }
+      print('TOKEN ENVIADO updatePost: ' + (accessToken ?? 'NULL'));
+      await _apiService.updatePost(postId, title, content, mediaUrls, token: accessToken);
+      await fetchPosts();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateComment(int postId, int commentId, String content, BuildContext context) async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final rawToken = userProvider.token;
+      String? accessToken;
+      if (rawToken != null) {
+        // Si el token es un JSON con access_token, extraerlo
+        if (rawToken.trim().startsWith('{') && rawToken.contains('access_token')) {
+          try {
+            final decoded = jsonDecode(rawToken);
+            if (decoded is Map && decoded['access_token'] is String) {
+              accessToken = decoded['access_token'] as String;
+            }
+          } catch (_) {
+            accessToken = null;
+          }
+        } else {
+          // Si es un token plano (JWT o similar), usarlo directamente
+          accessToken = rawToken;
+        }
+      }
+      print('TOKEN ENVIADO updateComment: ' + (accessToken ?? 'NULL'));
+      await _apiService.updateComment(postId, commentId, content, token: accessToken);
+      await fetchPosts();
     } catch (e) {
       _error = e.toString();
       notifyListeners();
@@ -90,4 +141,15 @@ class CommunityProvider extends ChangeNotifier {
   }
 
   bool isFavorite(Post post) => _favoritePosts.contains(post);
+
+  Future<void> deleteComment(int postId, int commentId) async {
+    try {
+      await _apiService.deleteComment(postId, commentId);
+      // Refrescar los posts para reflejar el cambio
+      await fetchPosts();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
 }

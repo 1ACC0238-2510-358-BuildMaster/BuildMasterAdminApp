@@ -41,8 +41,48 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
             final post = posts[i];
             return PostCard(
               post: post,
-              onEdit: () {
-                // TODO: Implement edit functionality
+              onEdit: () async {
+                final titleController = TextEditingController(text: post.title);
+                final contentController = TextEditingController(text: post.content);
+                final result = await showDialog<_PostDialogResult>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Editar publicación'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: titleController,
+                          decoration: const InputDecoration(labelText: 'Título'),
+                        ),
+                        TextField(
+                          controller: contentController,
+                          decoration: const InputDecoration(labelText: 'Contenido'),
+                          maxLines: 3,
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Cancelar'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          final title = titleController.text.trim();
+                          final content = contentController.text.trim();
+                          if (title.isNotEmpty && content.isNotEmpty) {
+                            Navigator.of(context).pop(_PostDialogResult(title, content));
+                          }
+                        },
+                        child: const Text('Guardar'),
+                      ),
+                    ],
+                  ),
+                );
+                if (result != null) {
+                  await provider.updatePost(post.id, result.title, result.content, post.mediaUrls, context);
+                }
               },
               onDelete: () async {
                 await provider.deletePost(post.id);

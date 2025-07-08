@@ -43,20 +43,76 @@ class PostApiService {
     }
   }
 
-  Future<Post> updatePost(int id, String title, String content, List<String> mediaUrls) async {
+  Future<Post> updatePost(int id, String title, String content, List<String> mediaUrls, {String? token}) async {
+    final url = Uri.parse('$baseUrl/posts/$id');
+    final bodyData = json.encode({
+      'title': title,
+      'content': content,
+      'media_urls': mediaUrls,
+    });
+    print('updatePost request url: $url');
+    print('updatePost request body: $bodyData');
+    final headers = {
+      'Content-Type': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+    print('updatePost headers: $headers');
     final response = await http.put(
-      Uri.parse('$baseUrl/posts/$id'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'title': title,
-        'content': content,
-        'media_urls': mediaUrls,
-      }),
+      url,
+      headers: headers,
+      body: bodyData,
     );
-    if (response.statusCode == 200) {
+    print('updatePost status: ${response.statusCode}');
+    print('updatePost body: ${response.body}');
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
       return Post.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 204 || response.body.isEmpty) {
+      return Post(
+        id: id,
+        title: title,
+        content: content,
+        mediaUrls: mediaUrls,
+        userId: 0,
+        username: '',
+        originalPostId: null,
+        likesCount: 0,
+        dislikesCount: 0,
+        comments: [],
+      );
     } else {
       throw Exception('Failed to update post');
+    }
+  }
+
+  Future<Comment> updateComment(int postId, int commentId, String content, {String? token}) async {
+    final url = Uri.parse('$baseUrl/posts/$postId/comment/$commentId');
+    final bodyData = json.encode({'content': content});
+    final headers = {
+      'Content-Type': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+    print('updateComment request url: $url');
+    print('updateComment request body: $bodyData');
+    print('updateComment headers: $headers');
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: bodyData,
+    );
+    print('updateComment status: ${response.statusCode}');
+    print('updateComment body: ${response.body}');
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      return Comment.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 204 || response.body.isEmpty) {
+      return Comment(
+        id: commentId,
+        content: content,
+        userId: 0,
+        postId: postId,
+        username: '',
+      );
+    } else {
+      throw Exception('Failed to update comment');
     }
   }
 
@@ -66,5 +122,13 @@ class PostApiService {
       throw Exception('Failed to delete post');
     }
   }
-}
 
+  Future<void> deleteComment(int postId, int commentId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/posts/$postId/comment/$commentId'),
+    );
+    if (response.statusCode != 204 && response.statusCode != 200) {
+      throw Exception('Failed to delete comment');
+    }
+  }
+}
